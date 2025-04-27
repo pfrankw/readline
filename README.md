@@ -12,7 +12,7 @@ Readline is a Rust asynchronous command line reader/emulator library.
 - Works with any tokio::io::AsyncRead
 - Cross-platform (Linux, macOS, Windows)
 
-# ✨ Installation
+# ⚙️ Installation
 Add this to your `Cargo.toml`:
 
 ```toml

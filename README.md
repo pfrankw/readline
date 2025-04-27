@@ -66,12 +66,5 @@ Users can edit the current input line with:
 
 While the library defaults to using stdin, you can provide your own input source that implements `AsyncRead + Unpin`.
 
-## 🔥 Why use this?
-
-- Native tokio support — no blocking anywhere
-- Multithread natively supported
-- Lightweight and minimal
-- Clean async design
-
 ## Author
 Made with ❤️ by Francesco Pompo'.

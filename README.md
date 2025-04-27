@@ -3,7 +3,7 @@
 Readline is a Rust asynchronous command line reader/emulator library.
 
 
-# 🛠️ Features
+# 🔑 Features
 - Async, non-blocking terminal input
 - History navigation (Up/Down arrows)
 - Line editing (Left/Right arrows, Backspace, Delete)

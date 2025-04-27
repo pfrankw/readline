@@ -22,7 +22,7 @@ readline = { git = "https://github.com/pfrankw/readline.git", version = "0.1.5" 
 ## ⚡ Quick start
 
 ```rust
-use readline::Readline; // or whatever your crate name will be
+use readline::Readline;
 use std::path::Path;
 
 #[tokio::main]
@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
                 println!("You entered: {}", line);
             }
             Err(_) => {
-                break; // Exit on Ctrl+C
+                break;
             }
         }
     }

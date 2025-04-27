@@ -1,18 +1,17 @@
 # Readline
 
-Readline is a Rust asynchronous command line reader/emulator library.
+A Rust library providing asynchronous command line emulation with editing capabilities and history management.
 
-
-# 🔑 Features
+## 🔑 Features
 - Async, non-blocking terminal input
 - History navigation (Up/Down arrows)
-- Line editing (Left/Right arrows, Backspace, Delete)
 - Persistent history file support
+- Line editing (Left/Right arrows, Backspace, Delete)
 - Customizable prompt
-- Works with any tokio::io::AsyncRead
+- Support for custom input sources (Works with any tokio::io::AsyncRead)
 - Cross-platform (Linux, macOS, Windows)
 
-# ⚙️ Installation
+## ⚙️ Installation
 Add this to your `Cargo.toml`:
 
 ```toml
@@ -20,7 +19,7 @@ Add this to your `Cargo.toml`:
 readline = { git = "https://github.com/pfrankw/readline.git", version = "0.1.5" }
 ```
 
-# ⚡ Quick start
+## ⚡ Quick start
 
 ```rust
 use readline::Readline; // or whatever your crate name will be
@@ -30,7 +29,7 @@ use std::path::Path;
 async fn main() -> std::io::Result<()> {
     let readline = Readline::new(None, "> ", Some(Path::new("history.txt"))).await;
 
-    Readline::enable_raw_mode().unwrap();
+    Readline::enable_raw_mode()?;
 
     loop {
         match readline.run().await {
@@ -43,19 +42,36 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
-    Readline::disable_raw_mode().unwrap();
+    Readline::disable_raw_mode()?;
 
     Ok(())
 }
 
 ```
 
-# 🔥 Why use this?
+## Key Features
+
+### History Management
+
+The library automatically manages command history, allowing users to navigate through previous commands using up and down arrow keys. History can be persisted to a file for use across sessions.
+
+### Line Editing
+
+Users can edit the current input line with:
+- Left/right arrow keys to move the cursor
+- Backspace to delete characters before the cursor
+- Delete key to remove characters after the cursor
+
+### Custom Input Sources
+
+While the library defaults to using stdin, you can provide your own input source that implements `AsyncRead + Unpin`.
+
+## 🔥 Why use this?
 
 - Native tokio support — no blocking anywhere
 - Multithread natively supported
 - Lightweight and minimal
 - Clean async design
 
-# Author
+## Author
 Made with ❤️ by Francesco Pompo'.

@@ -19,7 +19,7 @@ async fn test_backspace() {
     let input = b"ls -la Deskrop\x7F\x7F\x7Ftop\x7F\x7F\x7F\x7F\x7F\x7F\x7FDownloads\r\x03";
     let fake_stdin = FakeStdin::new(input);
 
-    let rl = Readline::new(Some(Box::new(fake_stdin)), "arrows > ", None).await;
+    let rl = Readline::new(fake_stdin, "arrows > ", None).await;
 
     assert_eq!(rl.run().await.unwrap(), "ls -la Downloads");
 

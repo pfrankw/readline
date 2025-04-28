@@ -11,7 +11,7 @@ async fn test_simple() {
     let fake_stdin = FakeStdin::new(input);
 
     let rl = Readline::new(
-        Some(Box::new(fake_stdin)),
+        fake_stdin,
         "simple > ",
         Some(Path::new(".readline_test_history")),
     )
@@ -28,7 +28,7 @@ async fn test_simple() {
     let input = b"\x1B\x01\x41\r";
     let fake_stdin = FakeStdin::new(input);
     let rl = Readline::new(
-        Some(Box::new(fake_stdin)),
+        fake_stdin,
         "simple > ",
         Some(Path::new(".readline_test_history")),
     )

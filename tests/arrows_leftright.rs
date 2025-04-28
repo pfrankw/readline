@@ -19,7 +19,7 @@ async fn test_arrows_leftright() {
         b"ls -la Deskrop\x1B\x01\x44\x1B\x01\x44\x1B\x01\x44\x1B\x01\x44\x1B\x01\x43\x7Et\r\x03";
     let fake_stdin = FakeStdin::new(input);
 
-    let rl = Readline::new(Some(Box::new(fake_stdin)), "arrows leftright > ", None).await;
+    let rl = Readline::new(fake_stdin, "arrows leftright > ", None).await;
 
     assert_eq!(rl.run().await.unwrap(), "ls -la Desktop");
 

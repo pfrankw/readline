@@ -6,29 +6,54 @@ use tokio::{
     sync::{Mutex, RwLock},
 };
 
-pub struct Readline {
+pub struct Readline<R> {
     prompt: RwLock<String>,
     history: RwLock<Vec<String>>,
     history_pos: RwLock<usize>, // Add history position tracking
     current_input: RwLock<String>,
     ci_pos: RwLock<usize>,
-    reader: Mutex<Box<dyn AsyncRead + Unpin>>,
+    reader: Mutex<R>,
     history_file: Option<Mutex<tokio::fs::File>>,
 }
 
-impl Readline {
-    pub async fn new(
-        reader: Option<Box<dyn AsyncRead + Unpin>>,
-        prompt: &str,
-        history_file: Option<&Path>,
-    ) -> Self {
+impl<R: AsyncRead + Unpin> Readline<R> {
+    /// Creates a new instance of the `Readline` struct.
+    ///
+    /// This function initializes a `Readline` instance with the provided reader, prompt string,
+    /// and an optional history file. It also loads the history from the file, if available,
+    /// and initializes the internal state.
+    ///
+    /// # Arguments
+    ///
+    /// * `reader` - An asynchronous reader that provides the input stream for reading user input.
+    /// * `prompt` - A string that will be displayed as the prompt for the user to see when they
+    ///   are typing. This is typically a short message like "Enter your command: ".
+    /// * `history_file` - An optional path to a file from which previous command history is loaded.
+    ///   If `None`, no history is loaded, and the history will be empty.
+    ///
+    /// # Returns
+    ///
+    /// This function returns a `Readline` instance that is ready to run. The state is initialized,
+    /// and history is loaded if a valid file path is provided.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use some_crate::Readline;
+    /// use std::io::{self, AsyncRead};
+    /// use tokio::io::stdin;
+    ///
+    /// let reader = stdin();
+    /// let readline = Readline::new(reader, "Enter your command: ", None).await.unwrap();
+    /// ```
+    pub async fn new(reader: R, prompt: &str, history_file: Option<&Path>) -> Self {
         let readline = Self {
             prompt: RwLock::new(String::from(prompt)),
             history: RwLock::new(Vec::new()),
             history_pos: RwLock::new(0), // Initialize history position
             current_input: RwLock::new(String::new()),
             ci_pos: Default::default(),
-            reader: Mutex::new(reader.unwrap_or(Box::new(tokio::io::stdin()))),
+            reader: Mutex::new(reader),
             history_file: match history_file {
                 Some(path) => Some(Mutex::new(
                     OpenOptions::new()

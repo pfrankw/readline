@@ -16,7 +16,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-readline = { git = "https://github.com/pfrankw/readline.git", version = "0.1.5" }
+readline = { git = "https://github.com/pfrankw/readline.git", version = "0.1.6" }
 ```
 
 ## ⚡ Quick start

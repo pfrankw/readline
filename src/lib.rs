@@ -39,7 +39,7 @@ impl<R: AsyncRead + Unpin> Readline<R> {
     /// # Example
     ///
     /// ```
-    /// use some_crate::Readline;
+    /// use readline::Readline;
     /// use std::io::{self, AsyncRead};
     /// use tokio::io::stdin;
     ///

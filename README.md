@@ -1,6 +1,6 @@
 # Readline
 
-A Rust library providing asynchronous command line emulation with editing capabilities and history management.
+A Rust library providing asynchronous line editing capabilities and history management.
 
 ## 🔑 Features
 - Async, non-blocking terminal input

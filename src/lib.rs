@@ -16,6 +16,12 @@ pub struct Readline<R> {
     history_file: Option<Mutex<tokio::fs::File>>,
 }
 
+pub enum Event {
+    Line(String),
+    CTRLC,
+    EOF,
+}
+
 impl Readline<Stdin> {
     pub async fn new_stdin(prompt: &str, history_file: Option<&Path>) -> Self {
         Self::new(tokio::io::stdin(), prompt, history_file).await
@@ -41,17 +47,6 @@ impl<R: AsyncRead + Unpin> Readline<R> {
     ///
     /// This function returns a `Readline` instance that is ready to run. The state is initialized,
     /// and history is loaded if a valid file path is provided.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use readline::Readline;
-    /// use std::io::{self, AsyncRead};
-    /// use tokio::io::stdin;
-    ///
-    /// let reader = stdin();
-    /// let readline = Readline::new(reader, "Enter your command: ", None).await.unwrap();
-    /// ```
     pub async fn new(reader: R, prompt: &str, history_file: Option<&Path>) -> Self {
         let readline = Self {
             prompt: RwLock::new(String::from(prompt)),
@@ -79,12 +74,11 @@ impl<R: AsyncRead + Unpin> Readline<R> {
         readline
     }
 
-    pub fn enable_raw_mode() -> crossterm::Result<()> {
-        terminal::enable_raw_mode()
-    }
+    async fn get_keycode(&self) -> Result<u8, io::Error> {
+        let mut buffer = [0u8; 1];
 
-    pub fn disable_raw_mode() -> crossterm::Result<()> {
-        terminal::disable_raw_mode()
+        self.reader.lock().await.read_exact(&mut buffer).await?;
+        Ok(buffer[0])
     }
 
     pub async fn run(&self) -> std::io::Result<String> {
@@ -135,12 +129,15 @@ impl<R: AsyncRead + Unpin> Readline<R> {
 
         Err(std::io::Error::new(std::io::ErrorKind::Other, "Exited"))
     }
+}
 
-    async fn get_keycode(&self) -> Result<u8, io::Error> {
-        let mut buffer = [0u8; 1];
+impl<R> Readline<R> {
+    pub fn enable_raw_mode() -> crossterm::Result<()> {
+        terminal::enable_raw_mode()
+    }
 
-        self.reader.lock().await.read_exact(&mut buffer).await?;
-        Ok(buffer[0])
+    pub fn disable_raw_mode() -> crossterm::Result<()> {
+        terminal::disable_raw_mode()
     }
 
     async fn insert_ci(&self, what: char) -> io::Result<()> {

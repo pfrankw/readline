@@ -2,7 +2,7 @@ use crossterm::terminal;
 use std::path::Path;
 use tokio::{
     fs::OpenOptions,
-    io::{self, AsyncRead, AsyncReadExt, AsyncWriteExt},
+    io::{self, AsyncRead, AsyncReadExt, AsyncWriteExt, Stdin},
     sync::{Mutex, RwLock},
 };
 
@@ -14,6 +14,12 @@ pub struct Readline<R> {
     ci_pos: RwLock<usize>,
     reader: Mutex<R>,
     history_file: Option<Mutex<tokio::fs::File>>,
+}
+
+impl Readline<Stdin> {
+    pub async fn new_stdin(prompt: &str, history_file: Option<&Path>) -> Self {
+        Self::new(tokio::io::stdin(), prompt, history_file).await
+    }
 }
 
 impl<R: AsyncRead + Unpin> Readline<R> {
@@ -280,7 +286,7 @@ impl<R: AsyncRead + Unpin> Readline<R> {
         *ci_pos -= 1;
         ci.remove(*ci_pos);
 
-        return true;
+        true
     }
 
     // Returns where to update the current line or not

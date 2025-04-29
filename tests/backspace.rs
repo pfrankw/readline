@@ -1,4 +1,4 @@
-use readline::Readline;
+use readline::{Event, Readline};
 
 mod fakestdin;
 use fakestdin::FakeStdin;
@@ -21,8 +21,10 @@ async fn test_backspace() {
 
     let rl = Readline::new(fake_stdin, "arrows > ", None).await;
 
-    assert_eq!(rl.run().await.unwrap(), "ls -la Downloads");
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("ls -la Downloads".to_string())
+    );
 
-    assert!(rl.run().await.is_err());
+    assert_eq!(rl.run().await.unwrap(), Event::CTRLC);
 }
-

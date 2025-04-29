@@ -1,4 +1,4 @@
-use readline::Readline;
+use readline::{Event, Readline};
 use std::path::Path;
 use tokio::fs;
 
@@ -17,11 +17,22 @@ async fn test_simple() {
     )
     .await;
 
-    assert_eq!(rl.run().await.unwrap(), "test command -r test");
-    assert_eq!(rl.run().await.unwrap(), "this is the second command -m 123");
-    assert_eq!(rl.run().await.unwrap(), "this is the second command -m 123");
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("test command -r test".to_string())
+    );
 
-    assert!(rl.run().await.is_err());
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("this is the second command -m 123".to_string())
+    );
+
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("this is the second command -m 123".to_string())
+    );
+
+    assert_eq!(rl.run().await.unwrap(), Event::CTRLC);
 
     std::mem::drop(rl);
 
@@ -34,8 +45,10 @@ async fn test_simple() {
     )
     .await;
 
-    assert_eq!(rl.run().await.unwrap(), "this is the second command -m 123");
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("this is the second command -m 123".to_string())
+    );
 
     fs::remove_file(".readline_test_history").await.unwrap();
 }
-

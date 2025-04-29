@@ -1,4 +1,4 @@
-use readline::Readline;
+use readline::{Event, Readline};
 
 mod fakestdin;
 use fakestdin::FakeStdin;
@@ -18,10 +18,20 @@ async fn test_arrows_updown() {
 
     let rl = Readline::new(fake_stdin, "arrows updown > ", None).await;
 
-    assert_eq!(rl.run().await.unwrap(), "test command -r one");
-    assert_eq!(rl.run().await.unwrap(), "not the previous command");
-    assert_eq!(rl.run().await.unwrap(), "not the previous command");
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("test command -r one".to_string())
+    );
 
-    assert!(rl.run().await.is_err());
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("not the previous command".to_string())
+    );
+
+    assert_eq!(
+        rl.run().await.unwrap(),
+        Event::Line("not the previous command".to_string())
+    );
+
+    assert_eq!(rl.run().await.unwrap(), Event::CTRLC);
 }
-

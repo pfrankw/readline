@@ -1,4 +1,4 @@
-use readline::Readline;
+use readline::{Event, Readline};
 
 mod fakestdin;
 use fakestdin::FakeStdin;
@@ -21,8 +21,8 @@ async fn test_arrows_leftright() {
 
     let rl = Readline::new(fake_stdin, "arrows leftright > ", None).await;
 
-    assert_eq!(rl.run().await.unwrap(), "ls -la Desktop");
+    assert_eq!(rl.run().await.unwrap(), Event::Line("ls -la Desktop".to_string()));
 
-    assert!(rl.run().await.is_err());
+    assert_eq!(rl.run().await.unwrap(), Event::CTRLC);
 }
 

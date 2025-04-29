@@ -16,10 +16,13 @@ pub struct Readline<R> {
     history_file: Option<Mutex<tokio::fs::File>>,
 }
 
+#[derive(PartialEq, Debug)]
 pub enum Event {
     Line(String),
     CTRLC,
     EOF,
+    TAB,
+    SUB,
 }
 
 impl Readline<Stdin> {
@@ -81,17 +84,20 @@ impl<R: AsyncRead + Unpin> Readline<R> {
         Ok(buffer[0])
     }
 
-    pub async fn run(&self) -> std::io::Result<String> {
-        let _ = self.print_current_line().await;
+    pub async fn run(&self) -> io::Result<Event> {
+        self.print_current_line().await?;
 
         loop {
             let k = self.get_keycode().await?;
 
             match k {
-                // CTRL + c
-                3 => {
-                    break;
-                }
+                // CTRL + c 
+                0x03 => return Ok(Event::CTRLC),
+                // CTRL + d
+                0x04 => return Ok(Event::EOF),
+                0x09 => return Ok(Event::TAB),
+                // CTRL + z
+                0x1A => return Ok(Event::SUB),
                 // Control code
                 27 => {
                     let _ = self.get_keycode().await?;
@@ -119,7 +125,7 @@ impl<R: AsyncRead + Unpin> Readline<R> {
                     self.on_backspace().await?;
                 }
                 13 => {
-                    return self.on_enter().await;
+                    return Ok(Event::Line(self.on_enter().await?));
                 }
                 _ => {
                     self.insert_ci(k as char).await?;
@@ -127,8 +133,8 @@ impl<R: AsyncRead + Unpin> Readline<R> {
             }
         }
 
-        Err(std::io::Error::new(std::io::ErrorKind::Other, "Exited"))
     }
+
 }
 
 impl<R> Readline<R> {
